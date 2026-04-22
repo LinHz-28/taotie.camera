@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>饕餮聚食魔・顯像之眼</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=ZCOOL+QingKe+HuangYou&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: #0a0604;
+    font-family: 'Noto Serif TC', serif;
+    color: #e8d9b8;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* === 開場畫面 === */
+  #intro {
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at center, #2a1810 0%, #0a0604 70%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 40px 30px;
+    z-index: 100;
+    transition: opacity 0.8s ease;
+  }
+
+  #intro.hidden { opacity: 0; pointer-events: none; }
+
+  .intro-seal {
+    width: 80px; height: 80px;
+    border: 2px solid #8b3a2a;
+    background: #3d1a10;
+    color: #e8d9b8;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'ZCOOL QingKe HuangYou', serif;
+    font-size: 38px;
+    margin-bottom: 30px;
+    transform: rotate(-5deg);
+    box-shadow: 0 0 40px rgba(139,58,42,0.6);
+    letter-spacing: -2px;
+  }
+
+  .intro-title {
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: 8px;
+    text-shadow: 0 0 20px rgba(232,217,184,0.3);
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .intro-subtitle {
+    font-size: 15px;
+    color: #9a7855;
+    letter-spacing: 4px;
+    margin-bottom: 50px;
+    text-align: center;
+  }
+
+  .intro-poem {
+    font-size: 17px;
+    line-height: 2;
+    color: #c4a77d;
+    text-align: center;
+    margin-bottom: 45px;
+    letter-spacing: 3px;
+  }
+
+  .intro-poem span { display: block; }
+  .intro-poem .accent { color: #e8d9b8; font-weight: 700; }
+
+  .start-btn {
+    padding: 16px 50px;
+    background: transparent;
+    border: 1px solid #8b3a2a;
+    color: #e8d9b8;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 16px;
+    letter-spacing: 6px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s;
+  }
+
+  .start-btn:active {
+    background: #3d1a10;
+    transform: scale(0.97);
+  }
+
+  .start-btn::before, .start-btn::after {
+    content: '';
+    position: absolute;
+    width: 10px; height: 10px;
+    border: 1px solid #8b3a2a;
+  }
+  .start-btn::before { top: -4px; left: -4px; border-right: none; border-bottom: none; }
+  .start-btn::after { bottom: -4px; right: -4px; border-left: none; border-top: none; }
+
+  .intro-hint {
+    margin-top: 30px;
+    font-size: 12px;
+    color: #6a5038;
+    letter-spacing: 2px;
+  }
+
+  /* === 相機畫面 === */
+  #camera-view {
+    position: fixed; inset: 0;
+    background: #000;
+  }
+
+  #video {
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+
+  /* === 饕餮遮罩層 === */
+  #overlay {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #taotie-svg {
+    width: 88vmin;
+    height: 88vmin;
+    max-width: 500px;
+    max-height: 500px;
+    transition: transform 0.2s ease, opacity 0.3s;
+    filter: drop-shadow(0 0 20px rgba(0,0,0,0.6));
+  }
+
+  /* === 四角準星 === */
+  .corner {
+    position: fixed;
+    width: 28px; height: 28px;
+    border: 2px solid rgba(232,217,184,0.7);
+    pointer-events: none;
+    mix-blend-mode: difference;
+  }
+  .corner.tl { top: 24px; left: 24px; border-right: none; border-bottom: none; }
+  .corner.tr { top: 24px; right: 24px; border-left: none; border-bottom: none; }
+  .corner.bl { bottom: 120px; left: 24px; border-right: none; border-top: none; }
+  .corner.br { bottom: 120px; right: 24px; border-left: none; border-top: none; }
+
+  /* === 頂部標題列 === */
+  #top-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+  }
+
+  #top-bar .title-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #top-bar .hint {
+    font-size: 11px;
+    color: rgba(232,217,184,0.6);
+    letter-spacing: 3px;
+  }
+
+  #top-bar .title {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 6px;
+    color: #e8d9b8;
+    margin-top: 2px;
+  }
+
+  #settings-btn {
+    width: 42px; height: 42px;
+    border: 1px solid rgba(232,217,184,0.5);
+    background: rgba(10,6,4,0.5);
+    backdrop-filter: blur(8px);
+    color: #e8d9b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+  }
+
+  /* === 底部面板 === */
+  #bottom-panel {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(to top, rgba(10,6,4,0.95) 0%, rgba(10,6,4,0.7) 80%, transparent 100%);
+    backdrop-filter: blur(4px);
+    padding: 20px 24px 30px;
+    z-index: 10;
+  }
+
+  .prompt-text {
+    font-size: 13px;
+    color: rgba(232,217,184,0.8);
+    letter-spacing: 3px;
+    text-align: center;
+    margin-bottom: 14px;
+    line-height: 1.6;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  #answer-input {
+    flex: 1;
+    padding: 14px 18px;
+    background: rgba(232,217,184,0.08);
+    border: 1px solid rgba(232,217,184,0.3);
+    color: #e8d9b8;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 18px;
+    letter-spacing: 4px;
+    text-align: center;
+    outline: none;
+  }
+
+  #answer-input:focus {
+    border-color: #c4a77d;
+    background: rgba(232,217,184,0.12);
+  }
+
+  #submit-btn {
+    padding: 14px 24px;
+    background: #8b3a2a;
+    border: none;
+    color: #e8d9b8;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 15px;
+    letter-spacing: 4px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+
+  #submit-btn:active { transform: scale(0.96); background: #6a2c20; }
+
+  /* === 設定面板 === */
+  #settings-panel {
+    position: fixed;
+    top: 80px; right: 24px;
+    background: rgba(10,6,4,0.92);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(232,217,184,0.3);
+    padding: 20px;
+    width: 220px;
+    z-index: 20;
+    display: none;
+  }
+
+  #settings-panel.open { display: block; }
+
+  .setting-label {
+    font-size: 11px;
+    color: #9a7855;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .setting-group { margin-bottom: 16px; }
+  .setting-group:last-child { margin-bottom: 0; }
+
+  input[type="range"] {
+    width: 100%;
+    -webkit-appearance: none;
+    background: transparent;
+  }
+
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 2px;
+    background: rgba(232,217,184,0.3);
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    background: #c4a77d;
+    margin-top: -7px;
+    cursor: pointer;
+    border-radius: 0;
+  }
+
+  /* === 回饋訊息 === */
+  #feedback {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(10,6,4,0.95);
+    border: 2px solid #8b3a2a;
+    padding: 30px 40px;
+    text-align: center;
+    z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    min-width: 240px;
+  }
+
+  #feedback.show { opacity: 1; }
+  #feedback.success { border-color: #c4a77d; }
+
+  #feedback .icon { font-size: 40px; margin-bottom: 10px; }
+  #feedback .msg { font-size: 17px; letter-spacing: 4px; color: #e8d9b8; }
+  #feedback .sub { font-size: 12px; color: #9a7855; margin-top: 8px; letter-spacing: 2px; }
+
+  /* === 錯誤狀態 === */
+  #error-view {
+    position: fixed; inset: 0;
+    background: #0a0604;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    text-align: center;
+    z-index: 200;
+  }
+
+  #error-view.show { display: flex; }
+  #error-view .icon { font-size: 50px; margin-bottom: 20px; color: #8b3a2a; }
+  #error-view h2 { font-size: 20px; letter-spacing: 4px; margin-bottom: 12px; }
+  #error-view p { font-size: 13px; color: #9a7855; line-height: 1.8; letter-spacing: 1px; }
+
+  /* 開場漂浮動畫 */
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  .intro-seal { animation: float 3s ease-in-out infinite; }
+</style>
+</head>
+<body>
+
+<!-- === 開場畫面 === -->
+<div id="intro">
+  <div class="intro-seal">妖</div>
+  <div class="intro-title">饕餮聚食魔</div>
+  <div class="intro-subtitle">顯 像 之 眼</div>
+  <div class="intro-poem">
+    <span>沉睡百年的神獸甦醒後</span>
+    <span>以 <span class="accent">食</span> 為名，以 <span class="accent">貪</span> 為形</span>
+    <span>唯有透過妖眼所見</span>
+    <span>方能窺見真相</span>
+  </div>
+  <button class="start-btn" id="start-btn">開 啟 妖 眼</button>
+  <div class="intro-hint">需要授權使用相機</div>
+</div>
+
+<!-- === 相機畫面 === -->
+<div id="camera-view">
+  <video id="video" autoplay playsinline muted></video>
+</div>
+
+<!-- === 饕餮遮罩 SVG === -->
+<div id="overlay">
+  <svg id="taotie-svg" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- 饕餮形狀：整體不透明黑色剪影，嘴巴區域鏤空 -->
+      <mask id="taotie-mask">
+        <!-- 白色部分會被保留（不透明），黑色部分會變透明 -->
+        <rect width="500" height="500" fill="white"/>
+        <!-- 嘴巴鏤空區域：居中偏下，不規則鋸齒形 -->
+        <path d="
+          M 160 290
+          L 180 310 L 175 330
+          L 195 315 L 205 340
+          L 225 320 L 235 345
+          L 255 325 L 265 350
+          L 285 328 L 295 350
+          L 315 325 L 325 345
+          L 340 320
+          L 340 360
+          L 325 380 L 315 375
+          L 295 390 L 280 380
+          L 260 388 L 245 378
+          L 225 385 L 210 375
+          L 190 378 L 175 360
+          L 165 340
+          Z
+        " fill="black"/>
+      </mask>
+
+      <!-- 饕餮外輪廓漸層 -->
+      <radialGradient id="body-gradient" cx="50%" cy="50%" r="60%">
+        <stop offset="0%" stop-color="#1a0a08"/>
+        <stop offset="100%" stop-color="#000"/>
+      </radialGradient>
+    </defs>
+
+    <!-- 饕餮主體 -->
+    <g mask="url(#taotie-mask)">
+      <!-- 頭部主體（類似你那張照片的渾圓造型） -->
+      <path d="
+        M 250 70
+        C 180 75, 120 115, 95 180
+        C 75 230, 78 285, 100 335
+        C 115 380, 145 410, 185 425
+        L 185 445
+        C 195 460, 215 462, 225 450
+        C 235 465, 260 465, 270 450
+        C 280 462, 300 460, 315 445
+        L 315 425
+        C 355 410, 385 380, 400 335
+        C 422 285, 425 230, 405 180
+        C 380 115, 320 75, 250 70
+        Z
+      " fill="url(#body-gradient)"/>
+
+      <!-- 頭頂毛髮尖刺 -->
+      <path d="
+        M 150 85 L 140 50 L 160 80 Z
+        M 180 70 L 175 35 L 195 75 Z
+        M 215 62 L 220 28 L 230 65 Z
+        M 250 58 L 260 25 L 265 62 Z
+        M 285 62 L 295 30 L 290 66 Z
+        M 320 72 L 335 42 L 325 78 Z
+        M 350 88 L 370 58 L 355 92 Z
+      " fill="#000"/>
+
+      <!-- 左右外側尖角 -->
+      <path d="M 90 180 L 55 155 L 88 195 Z" fill="#000"/>
+      <path d="M 85 230 L 45 220 L 88 245 Z" fill="#000"/>
+      <path d="M 410 180 L 445 155 L 412 195 Z" fill="#000"/>
+      <path d="M 415 230 L 455 220 L 412 245 Z" fill="#000"/>
+
+      <!-- 雙眼（留白） -->
+      <ellipse cx="175" cy="210" rx="28" ry="22" fill="#e8d9b8"/>
+      <ellipse cx="325" cy="210" rx="28" ry="22" fill="#e8d9b8"/>
+      <!-- 瞳孔 -->
+      <circle cx="175" cy="210" r="10" fill="#000"/>
+      <circle cx="325" cy="210" r="10" fill="#000"/>
+      <!-- 眼睛旁雲紋 -->
+      <path d="M 130 195 Q 120 210, 135 225 Q 145 215, 135 200 Z" fill="#000"/>
+      <path d="M 365 195 Q 375 210, 360 225 Q 350 215, 360 200 Z" fill="#000"/>
+
+      <!-- 鼻樑 -->
+      <path d="
+        M 245 240 Q 238 260, 242 280 L 258 280 Q 262 260, 255 240 Z
+      " fill="#000"/>
+
+      <!-- 嘴巴上方的牙齒粗線（讓鋸齒視覺更強） -->
+      <path d="
+        M 150 285 L 160 275 L 170 290 L 180 278 L 190 292
+        L 200 280 L 210 293 L 220 282 L 230 294 L 245 285
+        L 260 295 L 275 286 L 290 296 L 305 285 L 320 295
+        L 335 283 L 345 290
+      " stroke="#000" stroke-width="8" fill="none" stroke-linejoin="miter"/>
+
+      <!-- 下顎 -->
+      <path d="
+        M 145 380
+        Q 250 440, 355 380
+        L 340 400
+        Q 250 460, 160 400
+        Z
+      " fill="#000"/>
+
+      <!-- 底部鬍鬚/尾巴 -->
+      <path d="M 200 445 L 190 490 L 210 460 Z" fill="#000"/>
+      <path d="M 250 460 L 245 495 L 260 465 Z" fill="#000"/>
+      <path d="M 300 445 L 310 490 L 290 460 Z" fill="#000"/>
+    </g>
+
+    <!-- 裝飾性朱砂印章（右上角） -->
+    <g transform="translate(430, 30) rotate(-8)">
+      <rect x="0" y="0" width="44" height="44" fill="#8b3a2a" opacity="0.85"/>
+      <text x="22" y="32" text-anchor="middle" fill="#e8d9b8" font-family="ZCOOL QingKe HuangYou, serif" font-size="24">魔</text>
+    </g>
+  </svg>
+</div>
+
+<!-- === 四角準星 === -->
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<!-- === 頂部標題列 === -->
+<div id="top-bar">
+  <div class="title-group">
+    <div class="hint">第 參 關 · 顯 像</div>
+    <div class="title">妖 眼 所 見</div>
+  </div>
+  <button id="settings-btn">⚙</button>
+</div>
+
+<!-- === 設定面板 === -->
+<div id="settings-panel">
+  <div class="setting-group">
+    <label class="setting-label">妖 身 大 小</label>
+    <input type="range" id="size-slider" min="50" max="120" value="88">
+  </div>
+  <div class="setting-group">
+    <label class="setting-label">妖 氣 濃 度</label>
+    <input type="range" id="opacity-slider" min="60" max="100" value="100">
+  </div>
+</div>
+
+<!-- === 底部面板 === -->
+<div id="bottom-panel">
+  <div class="prompt-text">移 動 手 機 · 以 妖 眼 對 準 海 報<br>讓 鋸 齒 巨 口 吞 噬 線 條</div>
+  <div class="input-row">
+    <input type="text" id="answer-input" placeholder="輸 入 妖 口 所 見" maxlength="10">
+    <button id="submit-btn">獻 祭</button>
+  </div>
+</div>
+
+<!-- === 回饋訊息 === -->
+<div id="feedback">
+  <div class="icon" id="fb-icon"></div>
+  <div class="msg" id="fb-msg"></div>
+  <div class="sub" id="fb-sub"></div>
+</div>
+
+<!-- === 錯誤畫面 === -->
+<div id="error-view">
+  <div class="icon">⚠</div>
+  <h2>妖 眼 無 法 開 啟</h2>
+  <p id="error-msg">請確認已授權使用相機<br>並使用 HTTPS 連線開啟此頁面</p>
+</div>
+
+<script>
+  // ============ 設定區（你可以改這裡） ============
+  const CORRECT_ANSWER = '33';  // 正解
+  const SUCCESS_REDIRECT = null; // 答對後導向的 URL，null = 不導向只顯示成功訊息
+  // =============================================
+
+  const intro = document.getElementById('intro');
+  const startBtn = document.getElementById('start-btn');
+  const video = document.getElementById('video');
+  const errorView = document.getElementById('error-view');
+  const errorMsg = document.getElementById('error-msg');
+  const settingsBtn = document.getElementById('settings-btn');
+  const settingsPanel = document.getElementById('settings-panel');
+  const sizeSlider = document.getElementById('size-slider');
+  const opacitySlider = document.getElementById('opacity-slider');
+  const taotieSvg = document.getElementById('taotie-svg');
+  const answerInput = document.getElementById('answer-input');
+  const submitBtn = document.getElementById('submit-btn');
+  const feedback = document.getElementById('feedback');
+  const fbIcon = document.getElementById('fb-icon');
+  const fbMsg = document.getElementById('fb-msg');
+  const fbSub = document.getElementById('fb-sub');
+
+  // 開啟相機
+  async function startCamera() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: 'environment' }, // 後鏡頭優先
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        },
+        audio: false
+      });
+      video.srcObject = stream;
+      intro.classList.add('hidden');
+      setTimeout(() => intro.style.display = 'none', 800);
+    } catch (err) {
+      console.error('Camera error:', err);
+      let msg = '請確認已授權使用相機<br>並使用 HTTPS 連線開啟此頁面';
+      if (err.name === 'NotAllowedError') msg = '相機權限被拒絕<br>請至瀏覽器設定重新開啟';
+      else if (err.name === 'NotFoundError') msg = '找不到相機裝置';
+      else if (err.name === 'NotReadableError') msg = '相機被其他程式使用中';
+      errorMsg.innerHTML = msg;
+      errorView.classList.add('show');
+    }
+  }
+
+  startBtn.addEventListener('click', startCamera);
+
+  // 設定面板
+  settingsBtn.addEventListener('click', () => {
+    settingsPanel.classList.toggle('open');
+  });
+
+  // 大小控制
+  sizeSlider.addEventListener('input', (e) => {
+    const v = e.target.value;
+    taotieSvg.style.width = v + 'vmin';
+    taotieSvg.style.height = v + 'vmin';
+  });
+
+  // 透明度控制
+  opacitySlider.addEventListener('input', (e) => {
+    taotieSvg.style.opacity = e.target.value / 100;
+  });
+
+  // 答題邏輯
+  function checkAnswer() {
+    const val = answerInput.value.trim();
+    if (!val) {
+      showFeedback('⊘', '妖 口 尚 未 吐 露', '請先輸入你從妖口中看見的答案', false);
+      return;
+    }
+
+    // 答對:允許 33 或 33% 兩種格式
+    const normalized = val.replace(/%|％/g, '').trim();
+    if (normalized === CORRECT_ANSWER) {
+      showFeedback('✦', '妖 魔 退 散', '你已窺見真相——每年台灣 33% 食物遭浪費', true);
+      if (SUCCESS_REDIRECT) {
+        setTimeout(() => window.location.href = SUCCESS_REDIRECT, 2500);
+      }
+    } else {
+      showFeedback('✕', '妖 氣 未 散', '答案不符,請重新對位再試', false);
+    }
+  }
+
+  function showFeedback(icon, msg, sub, success) {
+    fbIcon.textContent = icon;
+    fbMsg.textContent = msg;
+    fbSub.textContent = sub;
+    feedback.classList.toggle('success', success);
+    feedback.classList.add('show');
+    if (!success) {
+      setTimeout(() => feedback.classList.remove('show'), 2200);
+    }
+  }
+
+  submitBtn.addEventListener('click', checkAnswer);
+  answerInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') checkAnswer();
+  });
+
+  // 防止雙擊縮放
+  document.addEventListener('touchmove', (e) => {
+    if (e.scale && e.scale !== 1) e.preventDefault();
+  }, { passive: false });
+</script>
+
+</body>
+</html>
