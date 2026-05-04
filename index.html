@@ -202,7 +202,7 @@
     bottom: 0; left: 0; right: 0;
     background: linear-gradient(to top, rgba(10,6,4,0.95) 0%, rgba(10,6,4,0.7) 80%, transparent 100%);
     backdrop-filter: blur(4px);
-    padding: 20px 24px 30px;
+    padding: 20px 24px max(30px, env(safe-area-inset-bottom));
     z-index: 10;
   }
 
@@ -217,11 +217,13 @@
 
   .input-row {
     display: flex;
-    gap: 10px;
+    gap: 12px;
+    align-items: stretch;
   }
 
   #answer-input {
     flex: 1;
+    min-width: 0;
     padding: 14px 18px;
     background: rgba(232,217,184,0.08);
     border: 1px solid rgba(232,217,184,0.3);
@@ -239,15 +241,19 @@
   }
 
   #submit-btn {
-    padding: 14px 24px;
+    flex: 0 0 auto;
+    min-width: 96px;
+    min-height: 52px;
+    padding: 14px 22px;
     background: #8b3a2a;
     border: none;
     color: #e8d9b8;
     font-family: 'Noto Serif TC', serif;
-    font-size: 15px;
+    font-size: 16px;
     letter-spacing: 4px;
     cursor: pointer;
     font-weight: 700;
+    touch-action: manipulation;
   }
 
   #submit-btn:active { transform: scale(0.96); background: #6a2c20; }
@@ -458,6 +464,29 @@
     margin-top: 12px;
   }
 
+  .return-btn {
+    margin-top: 28px;
+    padding: 16px 50px;
+    background: #8b3a2a;
+    border: 1px solid #c4a77d;
+    color: #e8d9b8;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 16px;
+    letter-spacing: 6px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s;
+  }
+  .return-btn:active { background: #6a2c20; transform: scale(0.97); }
+  .return-btn::before, .return-btn::after {
+    content: '';
+    position: absolute;
+    width: 10px; height: 10px;
+    border: 1px solid #c4a77d;
+  }
+  .return-btn::before { top: -4px; left: -4px; border-right: none; border-bottom: none; }
+  .return-btn::after  { bottom: -4px; right: -4px; border-left: none; border-top: none; }
+
   /* === 錯誤狀態 === */
   #error-view {
     position: fixed; inset: 0;
@@ -655,7 +684,7 @@
 <div id="bottom-panel">
   <div class="prompt-text">移 動 手 機 · 以 妖 眼 對 準 海 報<br>讓 鋸 齒 巨 口 吞 噬 線 條</div>
   <div class="input-row">
-    <input type="text" id="answer-input" placeholder="輸 入 妖 口 所 見" maxlength="10">
+    <input type="text" id="answer-input" placeholder="輸 入 妖 口 所 見" maxlength="10" inputmode="numeric" enterkeyhint="send" autocomplete="off">
     <button id="submit-btn">獻 祭</button>
   </div>
 </div>
@@ -689,8 +718,10 @@
       輸入下列文字通關
     </div>
     <div class="passphrase">惜食減廢</div>
-    <div class="next-step-hint">此關卡已完成・可關閉此頁</div>
+    <div class="next-step-hint">點 擊 下 方 按 鈕 返 回 遊 戲</div>
   </div>
+
+  <button class="return-btn" id="return-btn">確 定 · 返 回 遊 戲</button>
 </div>
 
 <!-- === 錯誤畫面 === -->
@@ -775,8 +806,11 @@
       return;
     }
 
-    // 答對:允許 33 或 33% 兩種格式
-    const normalized = val.replace(/%|％/g, '').trim();
+    // 答對:允許 33 或 33% 兩種格式（含全形數字、全形百分號）
+    const normalized = val
+      .replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
+      .replace(/%|％/g, '')
+      .trim();
     if (normalized === CORRECT_ANSWER) {
       showSuccessModal();
       if (SUCCESS_REDIRECT) {
@@ -807,6 +841,11 @@
   submitBtn.addEventListener('click', checkAnswer);
   answerInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') checkAnswer();
+  });
+
+  // 返回原遊戲網站
+  document.getElementById('return-btn').addEventListener('click', () => {
+    window.history.back();
   });
 
   // 防止雙擊縮放
