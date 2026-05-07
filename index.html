@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>饕餮聚食魔・顯像之眼</title>
+<title>饕餮聚食魔・顯像之眼 ｜ TAOTIE · Eye of Manifestation</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=ZCOOL+QingKe+HuangYou&display=swap');
 
@@ -38,6 +38,22 @@
   *::-webkit-scrollbar-corner {
     background: rgba(232,217,184,0.08);
   }
+
+  /* === 英文輔助文字（雙語）=== */
+  .en {
+    display: block;
+    font-family: 'Georgia', 'Noto Serif TC', serif;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 1.5px;
+    color: rgba(196, 167, 125, 0.75);
+    margin-top: 6px;
+    line-height: 1.5;
+    text-transform: uppercase;
+  }
+  .en.lower { text-transform: none; letter-spacing: 0.5px; }
+  .en.large { font-size: 13px; }
+  .en.tiny  { font-size: 10px; margin-top: 4px; }
 
   html, body {
     width: 100%; height: 100%;
@@ -575,16 +591,16 @@
 <!-- === 開場畫面 === -->
 <div id="intro">
   <div class="intro-seal">妖</div>
-  <div class="intro-title">饕餮聚食魔</div>
-  <div class="intro-subtitle">顯 像 之 眼</div>
+  <div class="intro-title">饕餮聚食魔<span class="en large">TAOTIE · The Voracious Demon</span></div>
+  <div class="intro-subtitle">顯 像 之 眼<span class="en">EYE OF MANIFESTATION</span></div>
   <div class="intro-poem">
-    <span>沉睡百年的神獸甦醒後</span>
-    <span>以 <span class="accent">食</span> 為名，以 <span class="accent">貪</span> 為形</span>
-    <span>唯有透過妖眼所見</span>
-    <span>方能窺見真相</span>
+    <span>沉睡百年的神獸甦醒後<span class="en lower tiny">After the century-sleeping divine beast awakens</span></span>
+    <span>以 <span class="accent">食</span> 為名，以 <span class="accent">貪</span> 為形<span class="en lower tiny">Named for HUNGER, shaped by GREED</span></span>
+    <span>唯有透過妖眼所見<span class="en lower tiny">Only through the demon's eye</span></span>
+    <span>方能窺見真相<span class="en lower tiny">can the truth be revealed</span></span>
   </div>
-  <button class="start-btn" id="start-btn">開 啟 妖 眼</button>
-  <div class="intro-hint">需要授權使用相機</div>
+  <button class="start-btn" id="start-btn">開 啟 妖 眼<span class="en">OPEN THE DEMON'S EYE</span></button>
+  <div class="intro-hint">需要授權使用相機<span class="en lower tiny">Camera permission required</span></div>
 </div>
 
 <!-- === 相機畫面 === -->
@@ -719,8 +735,8 @@
 <!-- === 頂部標題列 === -->
 <div id="top-bar">
   <div class="title-group">
-    <div class="hint">第 參 關 · 顯 像</div>
-    <div class="title">妖 眼 所 見</div>
+    <div class="hint">第 參 關 · 顯 像<span class="en tiny">STAGE 3 · MANIFESTATION</span></div>
+    <div class="title">妖 眼 所 見<span class="en tiny">THROUGH THE DEMON'S EYE</span></div>
   </div>
   <button id="settings-btn">⚙</button>
 </div>
@@ -728,21 +744,24 @@
 <!-- === 設定面板 === -->
 <div id="settings-panel">
   <div class="setting-group">
-    <label class="setting-label">妖 身 大 小</label>
+    <label class="setting-label">妖 身 大 小<span class="en tiny">DEMON SIZE</span></label>
     <input type="range" id="size-slider" min="50" max="120" value="88">
   </div>
   <div class="setting-group">
-    <label class="setting-label">妖 氣 濃 度</label>
+    <label class="setting-label">妖 氣 濃 度<span class="en tiny">DEMON AURA OPACITY</span></label>
     <input type="range" id="opacity-slider" min="30" max="100" value="60">
   </div>
 </div>
 
 <!-- === 底部面板 === -->
 <div id="bottom-panel">
-  <div class="prompt-text">移 動 手 機 · 以 妖 眼 對 準 海 報<br>讓 鋸 齒 巨 口 吞 噬 線 條</div>
+  <div class="prompt-text">
+    移 動 手 機 · 以 妖 眼 對 準 海 報<br>讓 鋸 齒 巨 口 吞 噬 線 條
+    <span class="en lower tiny">Aim the demon's eye at the poster · Let the jagged maw devour the lines</span>
+  </div>
   <div class="input-row">
-    <input type="text" id="answer-input" placeholder="輸 入 妖 口 所 見" maxlength="10" inputmode="numeric" enterkeyhint="send" autocomplete="off">
-    <button id="submit-btn">獻 祭</button>
+    <input type="text" id="answer-input" placeholder="輸入妖口所見 / Enter what you see" maxlength="10" inputmode="numeric" enterkeyhint="send" autocomplete="off">
+    <button id="submit-btn">獻 祭<span class="en tiny">SUBMIT</span></button>
   </div>
 </div>
 
@@ -756,38 +775,40 @@
 <!-- === 成功通關彈窗 === -->
 <div id="success-modal">
   <div class="success-seal">破</div>
-  <div class="success-title">妖 魔 退 散</div>
-  <div class="success-subtitle">真 相 顯 現</div>
+  <div class="success-title">妖 魔 退 散<span class="en">DEMON VANQUISHED</span></div>
+  <div class="success-subtitle">真 相 顯 現<span class="en tiny">TRUTH REVEALED</span></div>
 
   <div class="knowledge-card">
-    <div class="knowledge-label">◆ 妖 魔 真 相 ◆</div>
+    <div class="knowledge-label">◆ 妖 魔 真 相 ◆<span class="en tiny">THE DEMON'S TRUTH</span></div>
     <div class="knowledge-text">
       聯合國永續發展目標<br>
       <span class="knowledge-number">2030</span> 年前<br>
       全球食物浪費應減少 <span class="knowledge-number">33%</span>
+      <span class="en lower tiny">UN Sustainable Development Goals: cut global food waste by 33% before 2030</span>
     </div>
   </div>
 
   <div class="next-step-box">
-    <div class="next-step-label">◇ 通 關 指 示 ◇</div>
+    <div class="next-step-label">◇ 通 關 指 示 ◇<span class="en tiny">PASS INSTRUCTIONS</span></div>
     <div class="next-step-main">
       請 回 到 遊 戲 網 頁<br>
       下 列 任 一 組 文 字 皆 可 通 關
+      <span class="en lower tiny">Return to the game site, enter either passcode below</span>
     </div>
     <div class="passphrase">惜食減廢</div>
     <div class="passphrase-or">— 或 ／ OR —</div>
     <div class="passphrase passphrase-en">ZERO WASTE</div>
-    <div class="next-step-hint">點 擊 下 方 按 鈕 返 回 遊 戲</div>
+    <div class="next-step-hint">點 擊 下 方 按 鈕 返 回 遊 戲<span class="en lower tiny">Click the button below to return</span></div>
   </div>
 
-  <button class="return-btn" id="return-btn">確 定 · 返 回 遊 戲</button>
+  <button class="return-btn" id="return-btn">確 定 · 返 回 遊 戲<span class="en">CONFIRM · RETURN TO GAME</span></button>
 </div>
 
 <!-- === 錯誤畫面 === -->
 <div id="error-view">
   <div class="icon">⚠</div>
-  <h2>妖 眼 無 法 開 啟</h2>
-  <p id="error-msg">請確認已授權使用相機<br>並使用 HTTPS 連線開啟此頁面</p>
+  <h2>妖 眼 無 法 開 啟<span class="en">CANNOT OPEN THE DEMON'S EYE</span></h2>
+  <p id="error-msg">請確認已授權使用相機<br>並使用 HTTPS 連線開啟此頁面<span class="en lower tiny">Please grant camera permission and open this page over HTTPS</span></p>
 </div>
 
 <script>
@@ -829,10 +850,10 @@
       setTimeout(() => intro.style.display = 'none', 800);
     } catch (err) {
       console.error('Camera error:', err);
-      let msg = '請確認已授權使用相機<br>並使用 HTTPS 連線開啟此頁面';
-      if (err.name === 'NotAllowedError') msg = '相機權限被拒絕<br>請至瀏覽器設定重新開啟';
-      else if (err.name === 'NotFoundError') msg = '找不到相機裝置';
-      else if (err.name === 'NotReadableError') msg = '相機被其他程式使用中';
+      let msg = '請確認已授權使用相機<br>並使用 HTTPS 連線開啟此頁面<span class="en lower tiny">Please grant camera permission and open this page over HTTPS</span>';
+      if (err.name === 'NotAllowedError') msg = '相機權限被拒絕<br>請至瀏覽器設定重新開啟<span class="en lower tiny">Camera permission denied · please re-enable in browser settings</span>';
+      else if (err.name === 'NotFoundError') msg = '找不到相機裝置<span class="en lower tiny">No camera device found</span>';
+      else if (err.name === 'NotReadableError') msg = '相機被其他程式使用中<span class="en lower tiny">Camera is in use by another application</span>';
       errorMsg.innerHTML = msg;
       errorView.classList.add('show');
     }
@@ -861,7 +882,10 @@
   function checkAnswer() {
     const val = answerInput.value.trim();
     if (!val) {
-      showFeedback('⊘', '妖 口 尚 未 吐 露', '請先輸入你從妖口中看見的答案', false);
+      showFeedback('⊘',
+        '妖 口 尚 未 吐 露<span class="en tiny">THE DEMON HAS NOT SPOKEN</span>',
+        '請先輸入你從妖口中看見的答案<span class="en lower tiny">Please enter what you saw through the demon\'s mouth</span>',
+        false);
       return;
     }
 
@@ -876,7 +900,10 @@
         setTimeout(() => window.location.href = SUCCESS_REDIRECT, 3500);
       }
     } else {
-      showFeedback('✕', '妖 氣 未 散', '答案不符,請重新對位再試', false);
+      showFeedback('✕',
+        '妖 氣 未 散<span class="en tiny">THE DEMON\'S AURA REMAINS</span>',
+        '答案不符，請重新對位再試<span class="en lower tiny">Wrong answer · realign and try again</span>',
+        false);
     }
   }
 
@@ -888,8 +915,8 @@
 
   function showFeedback(icon, msg, sub, success) {
     fbIcon.textContent = icon;
-    fbMsg.textContent = msg;
-    fbSub.textContent = sub;
+    fbMsg.innerHTML = msg;
+    fbSub.innerHTML = sub;
     feedback.classList.toggle('success', success);
     feedback.classList.add('show');
     if (!success) {
