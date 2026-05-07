@@ -9,6 +9,36 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
+  /* === 滾動條樣式（符合主題）=== */
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(196,167,125,0.75) rgba(232,217,184,0.1);
+  }
+  /* Chrome / Safari / Edge */
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-track {
+    background: rgba(232,217,184,0.08);
+    border-left: 1px solid rgba(232,217,184,0.15);
+  }
+  *::-webkit-scrollbar-thumb {
+    background: rgba(196,167,125,0.7);
+    border: 2px solid rgba(10,6,4,0.5);
+    border-radius: 6px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgba(232,217,184,0.9);
+  }
+  *::-webkit-scrollbar-thumb:active {
+    background: #8b3a2a;
+  }
+  *::-webkit-scrollbar-corner {
+    background: rgba(232,217,184,0.08);
+  }
+
   html, body {
     width: 100%; height: 100%;
     overflow: hidden;
@@ -204,6 +234,15 @@
     backdrop-filter: blur(4px);
     padding: 20px 24px max(30px, env(safe-area-inset-bottom));
     z-index: 10;
+    transition: bottom 0.18s ease;
+  }
+
+  /* 橫向手機 / 窄高螢幕：堆疊輸入框與按鈕 */
+  @media (max-height: 520px), (max-width: 380px) {
+    #bottom-panel { padding: 12px 20px max(16px, env(safe-area-inset-bottom)); }
+    .prompt-text { margin-bottom: 8px; font-size: 12px; }
+    .input-row { flex-direction: column; gap: 8px; }
+    #submit-btn { width: 100%; min-height: 48px; }
   }
 
   .prompt-text {
@@ -334,12 +373,16 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 40px 30px;
+    justify-content: center;          /* 短內容居中 fallback */
+    justify-content: safe center;     /* 長內容不截切，可捲動 */
+    padding: max(40px, env(safe-area-inset-top)) 30px max(40px, env(safe-area-inset-bottom));
     z-index: 300;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.6s ease;
+    overflow-y: scroll;          /* 永遠保留滾動軌道（即使內容塞得下）*/
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
 
   #success-modal.show { opacity: 1; pointer-events: auto; }
@@ -852,6 +895,20 @@
   document.addEventListener('touchmove', (e) => {
     if (e.scale && e.scale !== 1) e.preventDefault();
   }, { passive: false });
+
+  // 鍵盤彈出時讓底部面板浮到鍵盤上方（iOS Safari 經典問題）
+  if (window.visualViewport) {
+    const vv = window.visualViewport;
+    const bottomPanel = document.getElementById('bottom-panel');
+    const adjust = () => {
+      const overlap = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      bottomPanel.style.bottom = overlap + 'px';
+    };
+    vv.addEventListener('resize', adjust);
+    vv.addEventListener('scroll', adjust);
+    answerInput.addEventListener('focus', () => setTimeout(adjust, 150));
+    answerInput.addEventListener('blur',  () => setTimeout(adjust, 150));
+  }
 </script>
 
 </body>
