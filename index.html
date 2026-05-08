@@ -70,10 +70,15 @@
     position: fixed; inset: 0;
     background: radial-gradient(ellipse at center, #2a1810 0%, #0a0604 70%);
     display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 40px 30px;
+    align-items: center;
+    justify-content: center;          /* 短內容居中 fallback */
+    justify-content: safe center;     /* 長內容不截切，可捲動 */
+    padding: max(40px, env(safe-area-inset-top)) 30px max(40px, env(safe-area-inset-bottom));
     z-index: 100;
     transition: opacity 0.8s ease;
+    overflow-y: scroll;               /* 永遠顯示滾動軌道 */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
 
   #intro.hidden { opacity: 0; pointer-events: none; }
