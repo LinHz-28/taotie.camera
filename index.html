@@ -275,6 +275,23 @@
     line-height: 1.6;
   }
 
+  .answer-hint {
+    font-size: 12px;
+    color: #c4a77d;
+    letter-spacing: 2px;
+    text-align: center;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    border: 1px dashed rgba(196,167,125,0.45);
+    background: rgba(232,217,184,0.05);
+    line-height: 1.6;
+  }
+  .answer-hint .accent {
+    color: #e8d9b8;
+    font-weight: 700;
+    padding: 0 2px;
+  }
+
   .input-row {
     display: flex;
     gap: 12px;
@@ -767,8 +784,12 @@
     移 動 手 機 · 以 妖 眼 對 準 海 報<br>讓 鋸 齒 巨 口 吞 噬 線 條
     <span class="en lower tiny">Aim the demon's eye at the poster · Let the jagged maw devour the lines</span>
   </div>
+  <div class="answer-hint">
+    ※ 答 案 為 <span class="accent">兩 個 數 字</span> 加 上 <span class="accent">一 個 數 學 符 號</span>，共 <span class="accent">三 碼</span>
+    <span class="en lower tiny">Hint: answer is <strong>2 digits</strong> + <strong>1 math symbol</strong> · <strong>3 characters total</strong></span>
+  </div>
   <div class="input-row">
-    <input type="text" id="answer-input" placeholder="輸入妖口所見 / Enter what you see" maxlength="10" inputmode="numeric" enterkeyhint="send" autocomplete="off">
+    <input type="text" id="answer-input" placeholder="輸入妖口所見 / Enter what you see" maxlength="10" enterkeyhint="send" autocomplete="off">
     <button id="submit-btn">獻 祭<span class="en tiny">SUBMIT</span></button>
   </div>
 </div>
