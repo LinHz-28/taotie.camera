@@ -309,6 +309,47 @@
   }
   .adjust-hint .accent { color: #c4a77d; font-weight: 700; }
 
+  /* 提示自動淡出：5 秒後三條提示同時透明 + 收合高度 */
+  .fade-collapse {
+    opacity: 0 !important;
+    max-height: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    border-width: 0 !important;
+    overflow: hidden;
+    transition: opacity 0.5s ease,
+                max-height 0.5s ease,
+                margin 0.5s ease,
+                padding 0.5s ease;
+  }
+  .prompt-text, .adjust-hint, .answer-hint {
+    max-height: 300px;
+    transition: opacity 0.5s ease,
+                max-height 0.5s ease,
+                margin 0.5s ease,
+                padding 0.5s ease;
+  }
+
+  /* 召回提示的小按鈕（淡出後才出現）*/
+  #hint-toggle {
+    display: none;
+    width: 100%;
+    padding: 7px 10px;
+    margin-bottom: 10px;
+    background: rgba(232,217,184,0.06);
+    border: 1px solid rgba(196,167,125,0.35);
+    color: #c4a77d;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  #hint-toggle.show { display: block; }
+  #hint-toggle:active { background: rgba(232,217,184,0.15); }
+
   /* 設定面板裡的重置按鈕 */
   #reset-pos-btn {
     width: 100%;
@@ -816,6 +857,7 @@
 
 <!-- === 底部面板 === -->
 <div id="bottom-panel">
+  <button id="hint-toggle">💡 顯 示 提 示 ／ SHOW HINT</button>
   <div class="prompt-text">
     移 動 手 機 · 以 妖 眼 對 準 海 報<br>讓 鋸 齒 巨 口 吞 噬 線 條
     <span class="en lower tiny">Aim the demon's eye at the poster · Let the jagged maw devour the lines</span>
@@ -917,6 +959,8 @@
       video.srcObject = stream;
       intro.classList.add('hidden');
       setTimeout(() => intro.style.display = 'none', 800);
+      // 相機啟動後啟動 5 秒提示淡出計時
+      scheduleHintFade();
     } catch (err) {
       console.error('Camera error:', err);
       let msg = '請確認已授權使用相機<br>並使用 HTTPS 連線開啟此頁面<span class="en lower tiny">Please grant camera permission and open this page over HTTPS</span>';
@@ -984,6 +1028,25 @@
     translateX = 0; translateY = 0;
     taotieSvg.style.transform = '';
   });
+
+  // 提示文字 5 秒後自動淡出收合，省畫面空間
+  const hintEls = () => document.querySelectorAll('.prompt-text, .adjust-hint, .answer-hint');
+  const hintToggle = document.getElementById('hint-toggle');
+  const HINT_AUTO_HIDE_MS = 5000;
+
+  function hideHints() {
+    hintEls().forEach(el => el.classList.add('fade-collapse'));
+    hintToggle.classList.add('show');
+  }
+  function showHintsAgain() {
+    hintEls().forEach(el => el.classList.remove('fade-collapse'));
+    hintToggle.classList.remove('show');
+    // 召回後不再自動淡出，避免無限循環
+  }
+  function scheduleHintFade() {
+    setTimeout(hideHints, HINT_AUTO_HIDE_MS);
+  }
+  hintToggle.addEventListener('click', showHintsAgain);
 
   // 答題邏輯
   function checkAnswer() {
