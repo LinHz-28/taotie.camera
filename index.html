@@ -309,6 +309,32 @@
   }
   .adjust-hint .accent { color: #c4a77d; font-weight: 700; }
 
+  /* 面板把手：可一鍵收合整個底部 panel */
+  #panel-toggle {
+    display: block;
+    width: 56px;
+    height: 22px;
+    margin: -6px auto 10px;     /* 微微浮到 panel 上緣 */
+    background: rgba(232,217,184,0.12);
+    border: 1px solid rgba(196,167,125,0.4);
+    border-radius: 11px;
+    color: #c4a77d;
+    font-size: 13px;
+    line-height: 1;
+    padding: 0;
+    cursor: pointer;
+    letter-spacing: 0;
+    transition: background 0.2s, transform 0.2s;
+  }
+  #panel-toggle:active { background: rgba(232,217,184,0.25); transform: scale(0.95); }
+
+  /* 收合狀態：只留把手，其餘元素全部隱藏 */
+  #bottom-panel.collapsed > *:not(#panel-toggle) { display: none; }
+  #bottom-panel.collapsed {
+    padding: 8px 24px max(8px, env(safe-area-inset-bottom));
+    background: linear-gradient(to top, rgba(10,6,4,0.85) 0%, transparent 100%);
+  }
+
   /* 提示自動淡出：5 秒後三條提示同時透明 + 收合高度 */
   .fade-collapse {
     opacity: 0 !important;
@@ -857,6 +883,7 @@
 
 <!-- === 底部面板 === -->
 <div id="bottom-panel">
+  <button id="panel-toggle" title="收合/展開面板">▾</button>
   <button id="hint-toggle">💡 顯 示 提 示 ／ SHOW HINT</button>
   <div class="prompt-text">
     移 動 手 機 · 以 妖 眼 對 準 海 報<br>讓 鋸 齒 巨 口 吞 噬 線 條
@@ -1047,6 +1074,15 @@
     setTimeout(hideHints, HINT_AUTO_HIDE_MS);
   }
   hintToggle.addEventListener('click', showHintsAgain);
+
+  // 面板把手：一鍵收合/展開整個底部 panel
+  const panelToggle = document.getElementById('panel-toggle');
+  panelToggle.addEventListener('click', () => {
+    const panel = document.getElementById('bottom-panel');
+    const collapsed = panel.classList.toggle('collapsed');
+    panelToggle.textContent = collapsed ? '▴' : '▾';
+    panelToggle.setAttribute('aria-expanded', !collapsed);
+  });
 
   // 答題邏輯
   function checkAnswer() {
