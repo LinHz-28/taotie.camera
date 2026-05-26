@@ -188,6 +188,13 @@
     opacity: 0.6;
     transition: transform 0.2s ease, opacity 0.3s;
     filter: drop-shadow(0 0 20px rgba(0,0,0,0.6));
+    pointer-events: auto;     /* 允許拖曳（overlay 父層仍為 none）*/
+    touch-action: none;       /* 拖曳時不觸發瀏覽器原生捲動 */
+    cursor: grab;
+  }
+  #taotie-svg.dragging {
+    cursor: grabbing;
+    transition: none;         /* 拖曳中關閉過渡，跟手更即時 */
   }
 
   /* === 四角準星 === */
@@ -291,6 +298,31 @@
     font-weight: 700;
     padding: 0 2px;
   }
+
+  .adjust-hint {
+    font-size: 11px;
+    color: rgba(232,217,184,0.55);
+    letter-spacing: 1.5px;
+    text-align: center;
+    margin-bottom: 10px;
+    line-height: 1.7;
+  }
+  .adjust-hint .accent { color: #c4a77d; font-weight: 700; }
+
+  /* 設定面板裡的重置按鈕 */
+  #reset-pos-btn {
+    width: 100%;
+    padding: 10px 12px;
+    background: transparent;
+    border: 1px solid rgba(232,217,184,0.4);
+    color: #e8d9b8;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  #reset-pos-btn:active { background: rgba(232,217,184,0.1); transform: scale(0.97); }
 
   .input-row {
     display: flex;
@@ -776,6 +808,10 @@
     <label class="setting-label">妖 氣 濃 度<span class="en tiny">DEMON AURA OPACITY</span></label>
     <input type="range" id="opacity-slider" min="30" max="100" value="60">
   </div>
+  <div class="setting-group">
+    <label class="setting-label">妖 位 調 整<span class="en tiny">POSITION</span></label>
+    <button id="reset-pos-btn">↺ 重 置 位 置 ／ RESET</button>
+  </div>
 </div>
 
 <!-- === 底部面板 === -->
@@ -783,6 +819,10 @@
   <div class="prompt-text">
     移 動 手 機 · 以 妖 眼 對 準 海 報<br>讓 鋸 齒 巨 口 吞 噬 線 條
     <span class="en lower tiny">Aim the demon's eye at the poster · Let the jagged maw devour the lines</span>
+  </div>
+  <div class="adjust-hint">
+    對 不 準 ？ <span class="accent">拖 曳 妖 頭</span> 移 動 · 或 點 <span class="accent">⚙</span> 調 整 大 小
+    <span class="en lower tiny">Can't align? <strong>Drag the demon</strong> to move · or tap <strong>⚙</strong> to resize / reset</span>
   </div>
   <div class="answer-hint">
     ※ 答 案 為 <span class="accent">兩 個 數 字</span> 加 上 <span class="accent">一 個 數 學 符 號</span>，共 <span class="accent">三 碼</span>
@@ -905,6 +945,44 @@
   // 透明度控制
   opacitySlider.addEventListener('input', (e) => {
     taotieSvg.style.opacity = e.target.value / 100;
+  });
+
+  // 拖曳妖頭調整位置（解決濾鏡被裁切時對不準的問題）
+  let dragState = null;
+  let translateX = 0, translateY = 0;
+
+  taotieSvg.addEventListener('pointerdown', (e) => {
+    dragState = {
+      startX: e.clientX,
+      startY: e.clientY,
+      initX: translateX,
+      initY: translateY,
+      pointerId: e.pointerId
+    };
+    taotieSvg.classList.add('dragging');
+    try { taotieSvg.setPointerCapture(e.pointerId); } catch (_) {}
+  });
+
+  taotieSvg.addEventListener('pointermove', (e) => {
+    if (!dragState) return;
+    translateX = dragState.initX + (e.clientX - dragState.startX);
+    translateY = dragState.initY + (e.clientY - dragState.startY);
+    taotieSvg.style.transform = `translate(${translateX}px, ${translateY}px)`;
+  });
+
+  const endDrag = () => {
+    if (!dragState) return;
+    taotieSvg.classList.remove('dragging');
+    try { taotieSvg.releasePointerCapture(dragState.pointerId); } catch (_) {}
+    dragState = null;
+  };
+  taotieSvg.addEventListener('pointerup', endDrag);
+  taotieSvg.addEventListener('pointercancel', endDrag);
+
+  // 重置位置
+  document.getElementById('reset-pos-btn').addEventListener('click', () => {
+    translateX = 0; translateY = 0;
+    taotieSvg.style.transform = '';
   });
 
   // 答題邏輯
